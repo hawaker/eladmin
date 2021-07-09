@@ -5,3 +5,4 @@
 */*.iml
 /.gradle/
 application-local.yml
+application-prod.yml
