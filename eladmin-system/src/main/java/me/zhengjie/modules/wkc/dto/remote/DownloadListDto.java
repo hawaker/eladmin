@@ -1,0 +1,29 @@
+package me.zhengjie.modules.wkc.dto.remote;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import me.zhengjie.modules.wkc.dto.AbstractSuccessAble;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+public class DownloadListDto extends AbstractSuccessAble {
+
+    @JsonProperty("recycleNum")
+    private Integer recycleNum;
+    @JsonProperty("serverFailNum")
+    private Integer serverFailNum;
+    @JsonProperty("sync")
+    private Integer sync;
+    @JsonProperty("dlNum")
+    private Integer dlNum;
+    @JsonProperty("completeNum")
+    private Integer completeNum;
+    @JsonProperty("rtn")
+    private Integer state;
+    @JsonProperty("tasks")
+    private List<TaskDto> tasks;
+}

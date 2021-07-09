@@ -68,6 +68,18 @@
             <artifactId>quartz</artifactId>
         </dependency>
 
+        <!--feign-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <version>10.7.4</version>
+        </dependency>
+        <!--io-->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
         <!-- linux的管理 -->
 		<dependency>
 			<groupId>ch.ethz.ganymed</groupId>
