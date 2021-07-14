@@ -15,49 +15,32 @@
 */
 package me.zhengjie.modules.wkc.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
-import javax.persistence.Column;
 import lombok.Data;
+import java.sql.Timestamp;
 import java.io.Serializable;
 
 /**
 * @website https://el-admin.vip
 * @description /
-* @author hawaker
-* @date 2021-06-21
+* @author caoqingyuan
+* @date 2021-07-12
 **/
 @Data
-public class WkcUserDto implements Serializable {
+public class WkcJobDto implements Serializable {
 
     private Integer id;
 
-    /** 手机号 */
-    private String phone;
+    /** 任务类型 */
+    private String type;
 
-    /** 关联用户 */
-    private String userId;
+    /** 网址 */
+    private String url;
 
-    /** 密码 */
-    private String password;
-
-    /** 玩客云token */
-    private String token;
-
-    private Integer accountType;
-
-    private Integer enableHomeShare;
-
-    private Integer bindPwd;
-
-    private Integer phoneArea;
+    private Timestamp createTime;
 
     /** 归属用户 */
-    private Long bindUser;
+    private Integer userId;
 
-    private String defaultDeviceId;
-
-    private String defaultUsbUuid;
-
-    private String defaultUsbPath;
+    /** 归属玩客云用户 */
+    private Integer wkcUserId;
 }

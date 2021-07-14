@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.wkc.domain.WkcUser;
+import me.zhengjie.modules.wkc.dto.account.UserDto;
 import me.zhengjie.modules.wkc.service.WkcUserService;
 import me.zhengjie.modules.wkc.service.dto.WkcUserQueryCriteria;
 import me.zhengjie.utils.SecurityUtils;
@@ -104,8 +105,8 @@ public class WkcUserController {
   @PreAuthorize("@el.check('wkcUser:login')")
   @GetMapping("/login")
   public ResponseEntity<Object> login(@RequestParam Integer id) {
-    wkcUserService.login(id);
-    return new ResponseEntity<>(HttpStatus.OK);
+    UserDto userDto=wkcUserService.login(id);
+    return new ResponseEntity<>(userDto,HttpStatus.OK);
   }
 
   @Log("获取玩客云节点")

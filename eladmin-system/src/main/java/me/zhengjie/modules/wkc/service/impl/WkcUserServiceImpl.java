@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ import me.zhengjie.utils.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +69,9 @@ public class WkcUserServiceImpl implements WkcUserService {
   private final WkcUserMapper wkcUserMapper;
   @Autowired
   WanKeCloudService wanKeCloudService;
+
+  @Autowired
+  RedisTemplate<String, String> redisTemplate;
 
   @Override
   public Map<String, Object> queryAll(WkcUserQueryCriteria criteria, Pageable pageable) {
@@ -148,6 +153,7 @@ public class WkcUserServiceImpl implements WkcUserService {
     UserDto userDto = userDtoAccountResponseDto.getData();
     wkcUser.setToken(userDto.getSessionId());
     wkcUserRepository.save(wkcUser);
+    redisTemplate.opsForValue().set(wkcUser.getToken(), wkcUserId.toString(), 6, TimeUnit.HOURS);
     return userDto;
   }
 
