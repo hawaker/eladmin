@@ -117,6 +117,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/file/**").permitAll()
                 // 阿里巴巴 druid
                 .antMatchers("/druid/**").permitAll()
+                //activiti
+                .antMatchers("/modeler.html").permitAll()
+                .antMatchers("/editor-app/**").permitAll()
+                .antMatchers("/diagram-viewer/**").permitAll()
+                .antMatchers("/model/**").permitAll()
+                .antMatchers("/editor/**").permitAll()
+                //oneCloud
                 .antMatchers("/oneCloud/**").permitAll()
                 // 放行OPTIONS请求
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()

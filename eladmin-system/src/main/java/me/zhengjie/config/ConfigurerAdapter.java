@@ -18,6 +18,7 @@ package me.zhengjie.config;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import org.apache.xmlbeans.impl.jam.provider.ResourcePath;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -69,6 +70,8 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl).setCachePeriod(0);
         registry.addResourceHandler("/file/**").addResourceLocations(pathUtl).setCachePeriod(0);
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/")
+            .addResourceLocations("classpath:/static/");
     }
 
     @Override

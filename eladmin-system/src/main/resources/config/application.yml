@@ -12,7 +12,16 @@ spring:
     redis:
       repositories:
         enabled: false
-
+  activiti:
+    database-schema-update: false
+    history-level: full
+    db-history-used: true
+    check-process-definitions: false
+  devtools:
+    restart:
+      enabled: true  #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: WEB-INF/**
   #配置 Jpa
   jpa:
     properties:
@@ -29,6 +38,8 @@ spring:
     password: ${REDIS_PWD:}
     #连接超时时间
     timeout: 5000
+  mvc:
+    static-path-pattern: /static/**
 
 task:
   pool:
