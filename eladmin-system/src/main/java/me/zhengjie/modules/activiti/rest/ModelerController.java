@@ -185,9 +185,9 @@ public class ModelerController {
     if (modelQueryCriteria.getName()!=null){
       modelQuery.modelName(modelQueryCriteria.getName());
     }
+    long count = modelQuery.count();
     List<Model> list = modelQuery
         .listPage(pageable.getPageSize() * pageable.getPageNumber(), pageable.getPageSize());
-    long count = repositoryService.createModelQuery().count();
     return new ResponseEntity<>(PageUtil.toPage(list,count),HttpStatus.OK);
   }
 
