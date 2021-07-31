@@ -2,11 +2,14 @@ package me.zhengjie.modules.activiti.rest;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.modules.activiti.dto.ProcessQueryCriteria;
 import me.zhengjie.modules.activiti.util.BeanUtil;
 import me.zhengjie.utils.PageUtil;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntityImpl;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -76,15 +79,16 @@ public class ProcessController extends BaseController {
    */
   @GetMapping
   @ResponseBody
-  public ResponseEntity<Object> processDefinition(ProcessQueryCriteria processQueryCriteria,
-      Pageable pageable) {
+  public ResponseEntity<Object> query(ProcessQueryCriteria criteria, Pageable pageable) {
     ProcessDefinitionQuery processDefinitionQuery = repositoryService
         .createProcessDefinitionQuery();
-    if (null != processQueryCriteria && processQueryCriteria.getName() != null) {
-      processDefinitionQuery.processDefinitionKey(processQueryCriteria.getName());
+    if (null != criteria && criteria.getName() != null) {
+      processDefinitionQuery.processDefinitionKey(criteria.getName());
     }
-    //只查激活的
-    // processDefinitionQuery.active();
+    if (null != criteria && criteria.getActivited() != null && criteria.getActivited()) {
+      // 只查激活的
+      processDefinitionQuery.active();
+    }
     // 创建一个流程定义查询
     /* 指定查询条件,where条件 */
     // .deploymentId(deploymentId)//使用部署对象ID查询
@@ -94,10 +98,11 @@ public class ProcessController extends BaseController {
     long count = processDefinitionQuery.count();
     /* 排序 */
     // .orderByProcessDefinitionName().desc()//按照流程定义的名称降序排列
-    List<ProcessDefinition> list = processDefinitionQuery.orderByProcessDefinitionVersion()
+    List<ProcessDefinition> list = processDefinitionQuery
+        .orderByProcessDefinitionVersion()
         .asc()// 按照版本的升序排列
-        .listPage(pageable.getPageSize() * pageable.getPageNumber(),
-            pageable.getPageSize());// 返回一个集合列表，封装流程定义
+        .listPage(pageable.getPageSize() * pageable.getPageNumber(), pageable.getPageSize());
+    // 返回一个集合列表，封装流程定义
     // .singleResult();//返回唯一结果集
     // .count();//返回结果集数量
     // .listPage(firstResult, maxResults)//分页查询
@@ -174,6 +179,4 @@ public class ProcessController extends BaseController {
     repositoryService.activateProcessDefinitionById(processDefinitionId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
-
 }

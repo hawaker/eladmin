@@ -131,7 +131,7 @@ public interface WkcUserService {
      * @param uuid      usb的UUID
      * @param path      usb的存储路径
      */
-    void setUserDefaultDevice(Integer wkcUserId, String deviceId, String uuid, String path);
+    void setUserDefaultDevice(Integer wkcUserId, String deviceId,String peerId, String uuid, String path);
 
     /**
      * 获取用户任务

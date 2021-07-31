@@ -3,7 +3,6 @@
  */
 package me.zhengjie.modules.activiti.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.beans.BeanInfo;
@@ -117,7 +116,7 @@ public class BeanUtil {
       try {
         map.put(methodName, method.invoke(object, new Object[0]));
       } catch (Exception e) {
-        //log.error("fail on methodName:[{}]", methodName, e);
+        log.error("fail on methodName:[{}],[{}]", methodName, e.getMessage());
         continue;
       }
     }

@@ -132,8 +132,8 @@ public class WkcUserController {
   @PreAuthorize("@el.check('wkcUser:peer')")
   @GetMapping("/defaultDevice")
   public ResponseEntity<Object> defaultDevice(@RequestParam Integer id,
-      @RequestParam String deviceId, @RequestParam String uuid, @RequestParam String path) {
-    wkcUserService.setUserDefaultDevice(id, deviceId, uuid, path);
+      @RequestParam String deviceId,@RequestParam String peerId, @RequestParam String uuid, @RequestParam String path) {
+    wkcUserService.setUserDefaultDevice(id, deviceId, peerId, uuid, path);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

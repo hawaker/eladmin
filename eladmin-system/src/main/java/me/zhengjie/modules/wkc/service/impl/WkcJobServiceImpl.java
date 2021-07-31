@@ -112,21 +112,28 @@ public class WkcJobServiceImpl implements WkcJobService {
         FileUtil.downloadExcel(list, response);
     }
 
-    public WkcJob createJob(Long userId, Integer wkcUserId, String type, String url) {
+    public WkcJob createJob(Long userId, Integer wkcUserId, String type, String url,Integer parentId) {
         WkcJob wkcJob= new WkcJob();
         wkcJob.setUrl(url);
         wkcJob.setType(type);
         wkcJob.setWkcUserId(wkcUserId);
         wkcJob.setUserId(userId);
+        wkcJob.setParentId(parentId);
+        wkcJob.setStatus(0);
         wkcJobRepository.save(wkcJob);
         return wkcJob;
     }
 
 
     @Override
-    public WkcJob createJob(Integer wkcUserId, String type, String url) {
+    public WkcJob createJob(Integer wkcUserId, String type, String url,Integer parentId) {
         WkcUserDto wkcUserDto=wkcUserService.findById(wkcUserId);
         Assert.notNull(wkcUserDto,"未找到用户:"+wkcUserId);
-        return this.createJob(wkcUserDto.getBindUser(),wkcUserId,type,url);
+        return this.createJob(wkcUserDto.getBindUser(),wkcUserId,type,url,parentId);
+    }
+
+    @Override
+    public List<WkcJob> queryByStatus(Integer status) {
+        return wkcJobRepository.queryByStatus(status);
     }
 }

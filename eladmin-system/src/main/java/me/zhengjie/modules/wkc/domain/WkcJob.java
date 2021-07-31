@@ -60,6 +60,18 @@ public class WkcJob implements Serializable {
     @ApiModelProperty(value = "归属玩客云用户")
     private Integer wkcUserId;
 
+    @Column(name = "parent_id")
+    @ApiModelProperty("异常信息")
+    private Integer parentId;
+
+    @Column(name = "exception_msg")
+    @ApiModelProperty("异常信息")
+    private String exceptionMsg;
+
+    @Column(name = "status")
+    @ApiModelProperty("状态")
+    private Integer status;
+
     public void copy(WkcJob source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }

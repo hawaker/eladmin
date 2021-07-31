@@ -15,6 +15,6 @@ public class AsyncServiceImpl implements AsyncService {
   @Override
   @Async
   public WkcJob createJob( Integer wkcUserId, String type, String url) {
-    return wkcJobService.createJob(wkcUserId,type,url);
+    return wkcJobService.createJob(wkcUserId,type,url,null);
   }
 }

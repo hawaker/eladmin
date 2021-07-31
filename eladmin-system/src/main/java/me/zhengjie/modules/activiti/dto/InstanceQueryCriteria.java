@@ -6,14 +6,11 @@ import lombok.Setter;
 /**
  * Description:
  *
- * @date:2021/7/18 3:29 下午
+ * @date:2021/7/21 11:54 上午
  * @author: caoqingyuan
  */
 @Getter
 @Setter
-public class ProcessQueryCriteria {
+public class InstanceQueryCriteria {
 
-  private String name;
-
-  private Boolean activited;
 }

@@ -185,11 +185,12 @@ public class WkcUserServiceImpl implements WkcUserService {
   }
 
   @Override
-  public void setUserDefaultDevice(Integer wkcUserId, String deviceId, String uuid, String path) {
+  public void setUserDefaultDevice(Integer wkcUserId, String deviceId, String peerId, String uuid, String path) {
     WkcUser wkcUser = getWkcUser(wkcUserId);
     wkcUser.setDefaultDeviceId(deviceId);
     wkcUser.setDefaultUsbUuid(uuid);
     wkcUser.setDefaultUsbPath(path);
+    wkcUser.setDefaultPeerId(peerId);
     wkcUserRepository.save(wkcUser);
   }
 

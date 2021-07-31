@@ -79,7 +79,7 @@ public class WkcUser implements Serializable {
     private Long bindUser;
 
     @Column
-    @ApiModelProperty(value = "默认节点ID")
+    @ApiModelProperty(value = "默认设备ID")
     private String defaultDeviceId;
 
     @Column
@@ -89,6 +89,11 @@ public class WkcUser implements Serializable {
     @Column
     @ApiModelProperty(value = "默认USB设备存储路径")
     private String defaultUsbPath;
+
+
+    @Column
+    @ApiModelProperty(value = "默认节点ID")
+    private String defaultPeerId;
 
     public void copy(WkcUser source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

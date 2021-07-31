@@ -177,13 +177,13 @@ public class ModelerController {
   }
 
   @GetMapping
-  public Object query(ModelQueryCriteria modelQueryCriteria, Pageable pageable) {
+  public Object query(ModelQueryCriteria criteria, Pageable pageable) {
     ModelQuery modelQuery=repositoryService.createModelQuery();
-    if (modelQueryCriteria.getId()!=null){
-      modelQuery.modelId(modelQueryCriteria.getId());
+    if (criteria.getId()!=null){
+      modelQuery.modelId(criteria.getId());
     }
-    if (modelQueryCriteria.getName()!=null){
-      modelQuery.modelName(modelQueryCriteria.getName());
+    if (criteria.getName()!=null){
+      modelQuery.modelName(criteria.getName());
     }
     long count = modelQuery.count();
     List<Model> list = modelQuery

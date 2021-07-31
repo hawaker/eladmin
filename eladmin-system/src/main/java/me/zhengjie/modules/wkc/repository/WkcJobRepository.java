@@ -15,6 +15,7 @@
 */
 package me.zhengjie.modules.wkc.repository;
 
+import java.util.List;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -25,4 +26,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 * @date 2021-07-12
 **/
 public interface WkcJobRepository extends JpaRepository<WkcJob, Integer>, JpaSpecificationExecutor<WkcJob> {
+
+  List<WkcJob> queryByStatus(Integer status);
 }

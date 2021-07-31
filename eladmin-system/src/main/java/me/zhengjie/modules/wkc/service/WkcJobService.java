@@ -85,11 +85,12 @@ public interface WkcJobService {
     /**
      * 创建任务
      *
-     * @param userId
      * @param wkcUserId
      * @param type
      * @param url
      * @return
      */
-    WkcJob createJob( Integer wkcUserId, String type, String url);
+    WkcJob createJob( Integer wkcUserId, String type, String url, Integer parentId);
+
+    List<WkcJob> queryByStatus(Integer status);
 }

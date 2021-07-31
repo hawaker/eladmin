@@ -15,6 +15,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -69,5 +71,13 @@ public class BaseController {
 		UserTask userTask = (UserTask) repositoryService.getBpmnModel(processDefinitionId)
 				.getFlowElement(taskDefinitionKey);
 		return userTask.getFormProperties();
+	}
+
+	protected ResponseEntity<Object> ok(){
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	protected ResponseEntity<Object> ok(Object o){
+		return new ResponseEntity<>(o,HttpStatus.OK);
 	}
 }

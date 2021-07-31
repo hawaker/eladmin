@@ -64,6 +64,9 @@ public interface UserService {
      */
     UserDto findByName(String userName);
 
+
+    String getById(long id);
+
     /**
      * 修改密码
      * @param username 用户名

@@ -9,19 +9,26 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import me.zhengjie.modules.activiti.dto.InstanceQueryCriteria;
 import me.zhengjie.modules.activiti.util.BeanUtil;
+import me.zhengjie.utils.PageUtil;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,13 +53,12 @@ public class InstanceController extends BaseController {
    * @see [相关类/方法](可选)
    * @since [产品/模块版本](可选)
    */
-  @RequestMapping(value = "/start")
+  @PostMapping(value = "/start")
   @ResponseBody
   public ResponseEntity<Object> start(@RequestParam String processDefinitionId,
-      @RequestBody LinkedHashMap<String, Object> variable) {
-    ProcessInstance instance = runtimeService.startProcessInstanceById(processDefinitionId, variable);
-    // Businesskey:业务标识，通常为业务表的主键，业务标识和流程实例一一对应。业务标识来源于业务系统。存储业务标识就是根据业务标识来关联查询业务系统的数据
-    // ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey,variables);
+      @RequestBody(required = false) LinkedHashMap<String, Object> variable) {
+    ProcessInstance instance = runtimeService
+        .startProcessInstanceById(processDefinitionId, variable);
     return new ResponseEntity<>(BeanUtil.beanToMapByName(instance), HttpStatus.OK);
   }
 
@@ -64,9 +70,9 @@ public class InstanceController extends BaseController {
    * @see [相关类/方法](可选)
    * @since [产品/模块版本](可选)
    */
-  @RequestMapping(value = "/delete")
+  @DeleteMapping(value = "{processInstanceId}/delete")
   @ResponseBody
-  public ResponseEntity<Object> deleteProcess(@RequestParam String processInstanceId) {
+  public ResponseEntity<Object> deleteProcess(@PathVariable String processInstanceId) {
     runtimeService.deleteProcessInstance(processInstanceId, "流程已完毕");
     return new ResponseEntity<>(true, HttpStatus.OK);
   }
@@ -79,16 +85,13 @@ public class InstanceController extends BaseController {
    * @see [相关类/方法](可选)
    * @since [产品/模块版本](可选)
    */
-  @RequestMapping(value = "/suspend")
+  @PostMapping(value = "{processInstanceId}/suspend")
   @ResponseBody
-  public ResponseEntity<Object> suspendProcessInstance(@RequestParam String processInstanceId) {
+  public ResponseEntity<Object> suspendProcessInstance(@PathVariable String processInstanceId) {
     // 根据一个流程实例的id挂起该流程实例
     runtimeService.suspendProcessInstanceById(processInstanceId);
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
         .processInstanceId(processInstanceId).singleResult();
-//    System.out.println("流程实例ID:" + processInstance.getId());
-//    System.out.println("流程定义ID:" + processInstance.getProcessDefinitionId());
-//    System.out.println("流程实例状态:" + processInstance.isSuspended());
     return new ResponseEntity<>(BeanUtil.beanToMapByName(processInstance), HttpStatus.OK);
   }
 
@@ -99,23 +102,27 @@ public class InstanceController extends BaseController {
    * @see [相关类/方法](可选)
    * @since [产品/模块版本](可选)
    */
-  @RequestMapping(value = "/activate")
+  @PostMapping(value = "{processInstanceId}/activate")
   @ResponseBody
-  public ResponseEntity<Object> activateProcessInstance(@RequestParam String processInstanceId) {
+  public ResponseEntity<Object> activateProcessInstance(@PathVariable String processInstanceId) {
     // 根据一个流程实例id激活该流程
     runtimeService.activateProcessInstanceById(processInstanceId);
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(processInstanceId).singleResult();
-//    System.out.println("流程实例ID:" + processInstance.getId());
-//    System.out.println("流程定义ID:" + processInstance.getProcessDefinitionId());
-//    System.out.println("流程实例状态:" + processInstance.isSuspended());
-    return new ResponseEntity<>(BeanUtil.beanToMapByName(processInstance), HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @GetMapping
+  public ResponseEntity<Object> query(InstanceQueryCriteria criteria, Pageable pageable) {
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    long count = query.count();
+    List<ProcessInstance> processInstances = query
+        .listPage(pageable.getPageSize() * pageable.getPageNumber(), pageable.getPageSize());
+    return new ResponseEntity<>(PageUtil.toPage(
+        BeanUtil.beanListToMapList(processInstances), count), HttpStatus.OK);
   }
 
 
-  @RequestMapping(value = "/image.svg", method = RequestMethod.GET)
-  public void image(HttpServletResponse response,
-      @RequestParam String processInstanceId) {
+  @GetMapping(value = "/image.svg")
+  public void image(HttpServletResponse response, @RequestParam String processInstanceId) {
     log.info("查看完整流程图！流程实例ID:{}", processInstanceId);
     // 根据流程对象获取流程对象模型
     HistoricProcessInstance historicProcessInstance = historyService
