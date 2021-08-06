@@ -1,7 +1,6 @@
 package me.zhengjie.modules.wkc.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import me.zhengjie.modules.wkc.client.WanKeCloudService;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.dto.remote.TaskActionDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskDto;
@@ -27,8 +26,6 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
   WkcUserService wkcUserService;
   @Autowired
   WkcJobService wkcJobService;
-  @Autowired
-  WanKeCloudService wanKeCloudService;
 
   @Override
   public void handle(WkcJob job) {
