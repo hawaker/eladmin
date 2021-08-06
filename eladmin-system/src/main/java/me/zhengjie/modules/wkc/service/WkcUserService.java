@@ -198,4 +198,19 @@ public interface WkcUserService {
      * @return
      */
     UrlResolveDto resolveUrl(Integer wkcUserId, String peerId,String url);
+
+    /**
+     * 根据uuid 获取用户
+     *
+     * @param uuid
+     * @return
+     */
+    WkcUser findByUuid(String uuid);
+
+    /**
+     * 刷新UUID
+     *
+     * @param wkcUserId
+     */
+    void refreshUuid(Integer wkcUserId);
 }

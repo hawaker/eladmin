@@ -109,6 +109,15 @@ public class WkcUserController {
     return new ResponseEntity<>(userDto,HttpStatus.OK);
   }
 
+  @Log("刷新UUID")
+  @ApiOperation("刷新UUID")
+  @PreAuthorize("@el.check('wkcUser:login')")
+  @GetMapping("/refreshUuid")
+  public ResponseEntity<Object> refreshUuid(@RequestParam Integer id) {
+    wkcUserService.refreshUuid(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
   @Log("获取玩客云节点")
   @ApiOperation("获取玩客云节点")
   @PreAuthorize("@el.check('wkcUser:peer')")

@@ -59,6 +59,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/oneCloud/**", config);
         return new CorsFilter(source);
     }
 

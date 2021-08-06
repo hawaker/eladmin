@@ -95,6 +95,10 @@ public class WkcUser implements Serializable {
     @ApiModelProperty(value = "默认节点ID")
     private String defaultPeerId;
 
+    @Column
+    @ApiModelProperty(value = "uuid")
+    private String uuid;
+
     public void copy(WkcUser source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }

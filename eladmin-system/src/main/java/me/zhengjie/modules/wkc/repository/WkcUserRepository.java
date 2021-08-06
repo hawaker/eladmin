@@ -15,6 +15,7 @@
 */
 package me.zhengjie.modules.wkc.repository;
 
+import java.util.Optional;
 import me.zhengjie.modules.wkc.domain.WkcUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -25,4 +26,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 * @date 2021-06-21
 **/
 public interface WkcUserRepository extends JpaRepository<WkcUser, Integer>, JpaSpecificationExecutor<WkcUser> {
+  Optional<WkcUser> findByUuid(String uuid);
 }

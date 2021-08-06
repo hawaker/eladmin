@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -153,7 +154,6 @@ public class WkcUserServiceImpl implements WkcUserService {
     UserDto userDto = userDtoAccountResponseDto.getData();
     wkcUser.setToken(userDto.getSessionId());
     wkcUserRepository.save(wkcUser);
-    redisTemplate.opsForValue().set(wkcUser.getToken(), wkcUserId.toString(), 6, TimeUnit.HOURS);
     return userDto;
   }
 
@@ -240,5 +240,23 @@ public class WkcUserServiceImpl implements WkcUserService {
   public UrlResolveDto resolveUrl(Integer wkcUserId, String peerId, String url) {
     WkcUser wkcUser = getWkcUser(wkcUserId);
     return wanKeCloudService.urlResolve(wkcUser.getToken(), wkcUser.getUserId(), peerId, url);
+  }
+
+
+  @Override
+  public WkcUser findByUuid(String uuid) {
+    return wkcUserRepository.findByUuid(uuid).get();
+  }
+
+
+  @Override
+  public void refreshUuid(Integer wkcUserId) {
+    WkcUser wkcUser=getWkcUser(wkcUserId);
+    if (wkcUser.getUuid()!=null){
+      redisTemplate.delete(wkcUser.getUuid());
+    }
+    UUID uuid = UUID.randomUUID();
+    wkcUser.setUuid(uuid.toString());
+    update(wkcUser);
   }
 }

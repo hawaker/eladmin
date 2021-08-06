@@ -62,4 +62,6 @@ public class WkcUserDto implements Serializable {
     private String defaultUsbPath;
 
     private String defaultPeerId;
+
+    private String uuid;
 }

@@ -20,6 +20,9 @@ import me.zhengjie.modules.security.config.bean.SecurityProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * @apiNote 配置文件转换Pojo类的 统一配置 类
@@ -40,4 +43,6 @@ public class ConfigBeanConfiguration {
     public SecurityProperties securityProperties() {
         return new SecurityProperties();
     }
+
+
 }
