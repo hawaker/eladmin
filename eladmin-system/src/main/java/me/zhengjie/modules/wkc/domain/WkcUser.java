@@ -54,7 +54,7 @@ public class WkcUser implements Serializable {
     @ApiModelProperty(value = "密码")
     private String password;
 
-    @Column(name = "token")
+    @Transient
     @ApiModelProperty(value = "玩客云token")
     private String token;
 
