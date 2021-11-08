@@ -1,7 +1,9 @@
 package me.zhengjie.modules.wkc.service.impl;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.modules.wkc.domain.WkcJob;
+import me.zhengjie.modules.wkc.dto.control.PartitionDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskActionDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskDto;
 import me.zhengjie.modules.wkc.dto.remote.UrlResolveDto;
@@ -11,6 +13,7 @@ import me.zhengjie.modules.wkc.service.WkcJobService;
 import me.zhengjie.modules.wkc.service.WkcUserService;
 import me.zhengjie.modules.wkc.service.dto.WkcUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Description:
@@ -30,10 +33,16 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
   @Override
   public void handle(WkcJob job) {
     WkcUserDto user = wkcUserService.findById(job.getWkcUserId());
-
     if (user.getDefaultDeviceId() == null || user.getDefaultDeviceId().isEmpty()) {
       log.error("用户[{}]未设置默认设备", user.getPhone());
       job.setExceptionMsg("用户未设置默认设备");
+      wkcJobService.update(job);
+      return;
+    }
+    List<PartitionDto> usbs=wkcUserService.getUSBInfo(job.getWkcUserId(),user.getDefaultDeviceId());
+    if (CollectionUtils.isEmpty(usbs)){
+      log.error("用户[{}]默认设备未在线", user.getPhone());
+      job.setExceptionMsg("用户默认设备未在线");
       wkcJobService.update(job);
       return;
     }
