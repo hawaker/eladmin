@@ -184,7 +184,8 @@ public class WkcUserServiceImpl implements WkcUserService {
     WkcUser wkcUser = getWkcUser(wkcUserId);
     ControlResponseDto controlResponseDto = wanKeCloudService
         .getPeerInfo(wkcUser.getToken(), wkcUser.getUserId());
-    Assert.isTrue(controlResponseDto.success(), "获取用户节点信息失败,id:" + wkcUserId);
+    Assert.isTrue(controlResponseDto.success(),
+        "获取用户节点信息失败,id:" + wkcUserId + ",msg:" + controlResponseDto.getMsg());
     return controlResponseDto.getAppearence().getDevices();
   }
 

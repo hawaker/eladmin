@@ -22,7 +22,7 @@ public class JobExecutor {
   @Autowired
   JobTypeProxyService jobTypeProxyService;
 
-  @Scheduled(cron = "0/20 * * * * ?")
+
   public void handleJob() {
     log.info("检查定时任务[job],开始");
     List<WkcJob> jobs = wkcJobService.queryByStatus(0);
