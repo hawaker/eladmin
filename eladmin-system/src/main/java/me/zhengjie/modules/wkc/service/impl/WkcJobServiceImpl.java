@@ -16,6 +16,8 @@
 package me.zhengjie.modules.wkc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.service.WkcUserService;
 import me.zhengjie.modules.wkc.service.dto.WkcUserDto;
@@ -120,6 +122,7 @@ public class WkcJobServiceImpl implements WkcJobService {
         wkcJob.setUserId(userId);
         wkcJob.setParentId(parentId);
         wkcJob.setStatus(0);
+        wkcJob.setCreateTime(Timestamp.valueOf(LocalDateTime.now()));
         wkcJobRepository.save(wkcJob);
         return wkcJob;
     }
