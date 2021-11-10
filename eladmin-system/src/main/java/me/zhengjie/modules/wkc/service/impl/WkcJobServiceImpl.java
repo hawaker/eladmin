@@ -42,6 +42,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import org.springframework.util.CollectionUtils;
 
 /**
 * @website https://el-admin.vip
@@ -115,6 +116,10 @@ public class WkcJobServiceImpl implements WkcJobService {
     }
 
     public WkcJob createJob(Long userId, Integer wkcUserId, String type, String url,Integer parentId) {
+        List<WkcJob> jobs= wkcJobRepository.queryByUserIdAndTypeAndUrl(userId,type,url);
+        if (!CollectionUtils.isEmpty(jobs)){
+            return jobs.get(0);
+        }
         WkcJob wkcJob= new WkcJob();
         wkcJob.setUrl(url);
         wkcJob.setType(type);

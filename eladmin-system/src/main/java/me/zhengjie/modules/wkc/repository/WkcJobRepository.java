@@ -28,4 +28,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface WkcJobRepository extends JpaRepository<WkcJob, Integer>, JpaSpecificationExecutor<WkcJob> {
 
   List<WkcJob> queryByStatus(Integer status);
+
+  List<WkcJob> queryByUserIdAndTypeAndUrl(Long userId,String type,String url);
 }
