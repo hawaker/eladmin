@@ -141,18 +141,19 @@ public class WkcUserServiceImpl implements WkcUserService {
   }
 
 
+
   private WkcUser getWkcUser(Integer wkcUserId) {
     Optional<WkcUser> wkcUserOpt = wkcUserRepository.findById(wkcUserId);
     Assert.notNull(wkcUserOpt, "获取玩客云用户出错,id:" + wkcUserId);
     WkcUser wkcUser=wkcUserOpt.get();
     String token =redisTemplate.opsForValue().get(redisTokenPrefix+wkcUserId);
-    if (null==token){
+    if (null == token) {
       AccountResponseDto<UserDto> userDtoAccountResponseDto = wanKeCloudService
           .login(wkcUser.getPhone(), wkcUser.getPassword());
       Assert.isTrue(userDtoAccountResponseDto.success(), "用户登录失败,id:" + wkcUserId);
       UserDto userDto = userDtoAccountResponseDto.getData();
-      token= userDto.getSessionId();
-      redisTemplate.opsForValue().set(redisTokenPrefix+wkcUserId,token,12,TimeUnit.HOURS);
+      token = userDto.getSessionId();
+      redisTemplate.opsForValue().set(redisTokenPrefix + wkcUserId, token, 12, TimeUnit.HOURS);
     }
     wkcUser.setToken(token);
     return wkcUser;
@@ -165,7 +166,7 @@ public class WkcUserServiceImpl implements WkcUserService {
         .login(wkcUser.getPhone(), wkcUser.getPassword());
     Assert.isTrue(userDtoAccountResponseDto.success(), "用户登录失败,id:" + wkcUserId);
     UserDto userDto = userDtoAccountResponseDto.getData();
-    wkcUser.setToken(userDto.getSessionId());
+    wkcUser.setUserId(userDto.getUserId());
     wkcUserRepository.save(wkcUser);
     return userDto;
   }
