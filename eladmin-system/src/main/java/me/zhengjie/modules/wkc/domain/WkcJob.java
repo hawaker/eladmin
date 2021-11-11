@@ -72,6 +72,9 @@ public class WkcJob implements Serializable {
     @ApiModelProperty("状态")
     private Integer status;
 
+    @ApiModelProperty("名称")
+    private String name;
+
     public void copy(WkcJob source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }

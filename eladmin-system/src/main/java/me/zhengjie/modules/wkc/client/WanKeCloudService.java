@@ -1,5 +1,8 @@
 package me.zhengjie.modules.wkc.client;
 
+import cn.hutool.json.JSON;
+import com.qiniu.util.Json;
+import com.qiniu.util.StringMap;
 import feign.Feign;
 import feign.Retryer;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import me.zhengjie.modules.wkc.dto.remote.TaskDto;
 import me.zhengjie.modules.wkc.dto.remote.UrlResolveDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -56,46 +60,58 @@ public class WanKeCloudService {
         WanKeCloudService wanKeCloudService = new WanKeCloudService();
         wanKeCloudService.initService();
 
-        AccountResponseDto<UserDto> user = wanKeCloudService.login("", "");
-
-        String sessionId = user.getData().getSessionId();
-        String userId = user.getData().getUserId();
-
-        AccountResponseDto<AccountDto> userInfo = wanKeCloudService.getAccountInfo(sessionId, userId);
-        AccountResponseDto<IncomeHistoryDto> history = wanKeCloudService.getIncomeHistory(sessionId, userId, 0);
-        ControlResponseDto controlResponseDto = wanKeCloudService.getPeerInfo(sessionId, userId);
-        AppearanceDto appearanceDto = controlResponseDto.getAppearence();
-        String deviceId = "";
-        String peerId = "";
-        for (DeviceDto device : appearanceDto.getDevices()) {
-            deviceId = device.getDeviceId();
-            peerId = device.getPeerId();
-            break;
-        }
-        ControlResponseDto usb = wanKeCloudService.getUSBInfo(sessionId, userId, deviceId, "2", "9", "1", APP_VERSION);
-        AppearanceDto appearanceDto1 = usb.getAppearence();
-
-        DownloadLoginDto remoteDownloadLogin = wanKeCloudService.remoteDownloadLogin(sessionId, userId, peerId, "1", "32", APP_VERSION);
-
-        UrlResolveDto urlResolveDto = wanKeCloudService.urlResolve(sessionId, userId, peerId, "magnet:?xt=urn:btih:DBE39272D5D8C06B68C95019E4DC06F2BCE8F625&dn=IBW766&tr=http://z1.1080pgqzz.club/pw/thread.php?fid=98", "1", "31");
-        List<TaskDto> tasks = new ArrayList<>();
+        //AccountResponseDto<UserDto> user = wanKeCloudService.login("17600776604", "b13frdely");
+        //
+        //String sessionId = user.getData().getSessionId();
+        //String userId = user.getData().getUserId();
+        //System.out.println(sessionId);
+        //System.out.println(userId);
+        //
+        //AccountResponseDto<AccountDto> userInfo = wanKeCloudService.getAccountInfo(sessionId, userId);
+        //AccountResponseDto<IncomeHistoryDto> history = wanKeCloudService.getIncomeHistory(sessionId, userId, 0);
+        //ControlResponseDto controlResponseDto = wanKeCloudService.getPeerInfo(sessionId, userId);
+        //AppearanceDto appearanceDto = controlResponseDto.getAppearence();
+        //String deviceId = "";
+        //String peerId = "";
+        //for (DeviceDto device : appearanceDto.getDevices()) {
+        //    deviceId = device.getDeviceId();
+        //    peerId = device.getPeerId();
+        //    break;
+        //}
+        //System.out.println(deviceId);
+        //System.out.println(peerId);
+        //ControlResponseDto usb = wanKeCloudService.getUSBInfo(sessionId, userId, deviceId);
+        //AppearanceDto appearanceDto1 = usb.getAppearence();
+        //
+        //DownloadLoginDto remoteDownloadLogin = wanKeCloudService.remoteDownloadLogin(sessionId, userId, peerId);
+        //
+        //UrlResolveDto urlResolveDto = wanKeCloudService.urlResolve(sessionId, userId, peerId, "https://bitsdts.net/torrent/AAF43B6092953A93DC9DE0377CCF3603BA0D73CB");
+        //System.out.println(Json.encode(urlResolveDto));
+        String sessionId="cs001.373976D0F6095C3A9C6B8D7D3F883421";
+        String userId="1626853709";
+        String deviceId = "duzIPMzw3395";
+        String peerId = "B0D59DE2E05A889X0030";
+        String buf="{\"infohash\":\"\",\"taskInfo\":{\"createTime\":0,\"dcdnChannel\":{\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"state\":0,\"failCode\":0,\"speed\":0},\"state\":0,\"id\":\"0\",\"refer\":\"\",\"progress\":0,\"exist\":0,\"url\":\"https:\\/\\/bitsdts.net\\/torrent\\/AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"remainTime\":0,\"size\":\"0\",\"name\":\"AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"failCode\":0,\"lixianChannel\":{\"dlBytes\":1234,\"state\":0,\"serverSpeed\":0,\"dlSize\":\"0\",\"serverProgress\":0,\"failCode\":0,\"speed\":0},\"from\":0,\"subList\":[],\"path\":\"\\/app\\/system\\/miner.plugin-etm.ipk\\/tmp\\/\",\"speed\":0,\"downTime\":0,\"vipChannel\":{\"opened\":0,\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"speed\":0,\"failCode\":0,\"type\":0},\"completeTime\":0,\"type\":1},\"rtn\":0}";
+        StringMap stringMap = Json.decode(buf);
+        System.out.println(Json.encode(stringMap.get("taskInfo")));
+        //List<TaskDto> tasks = new ArrayList<>();
         TaskDto taskDto = new TaskDto();
-        taskDto.setName("黄石.Yellowstone.2018.S01E08.中英字幕.WEB.720P-人人影视.mp4");
+        taskDto.setName(stringMap.get("taskInfo").getClass().getSimpleName());
         taskDto.setUrl("ed2k://|file|%E9%BB%84%E7%9F%B3.Yellowstone.2018.S01E08.%E4%B8%AD%E8%8B%B1%E5%AD%97%E5%B9%95.WEB.720P-%E4%BA%BA%E4%BA%BA%E5%BD%B1%E8%A7%86.mp4|472873520|c273bf00703b45225f2056393d6de87f|h=yq4vc2vndh2fnqdiwnhnqapwh7xcvlrw|/");
-        tasks.add(taskDto);
-        TaskActionDto TaskActionDto = wanKeCloudService.createTasks(sessionId, userId, peerId, "/media/sda1/onecloud/tddownload", tasks, "1", "31");
-        DownloadListDto remoteDownloadLogin1 = wanKeCloudService.remoteDownloadList(sessionId, userId, peerId, 0, 10, "4", "0", "2", "31");
-        String taskId = "";
-        List<TaskDto> taskDtos = remoteDownloadLogin1.getTasks();
-        for (TaskDto taskDto1 : taskDtos) {
-            if (taskDto1.getName().contains("黄石")) {
-                taskId = taskDto1.getId();
-            }
-        }
-        TaskActionDto taskActionDto1 = wanKeCloudService.pause(sessionId, userId, peerId, taskId + "_0", "1", "31");
-        TaskActionDto taskActionDto2 = wanKeCloudService.start(sessionId, userId, peerId, taskId + "_9", "1", "31");
-        TaskActionDto taskActionDto3 = wanKeCloudService.del(sessionId, userId, peerId, taskId + "_9", true, false, "1", "31");
-        System.out.println("ss");
+        //tasks.add(taskDto);
+        //TaskActionDto TaskActionDto = wanKeCloudService.createTask(sessionId, userId, peerId, "/media/sda1/onecloud/tddownload", taskDto);
+        //DownloadListDto remoteDownloadLogin1 = wanKeCloudService.remoteDownloadList(sessionId, userId, peerId, 0, 10);
+        //String taskId = "";
+        //List<TaskDto> taskDtos = remoteDownloadLogin1.getTasks();
+        //for (TaskDto taskDto1 : taskDtos) {
+        //    if (taskDto1.getName().contains("黄石")) {
+        //        taskId = taskDto1.getId();
+        //    }
+        //}
+        //TaskActionDto taskActionDto1 = wanKeCloudService.pause(sessionId, userId, peerId, taskId + "_0", "1", "31");
+        //TaskActionDto taskActionDto2 = wanKeCloudService.start(sessionId, userId, peerId, taskId + "_9", "1", "31");
+        //TaskActionDto taskActionDto3 = wanKeCloudService.del(sessionId, userId, peerId, taskId + "_9", true, false, "1", "31");
+        //System.out.println("ss");
     }
 
     /**

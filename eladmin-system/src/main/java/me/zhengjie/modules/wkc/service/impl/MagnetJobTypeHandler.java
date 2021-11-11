@@ -78,6 +78,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
       return;
     }
     job.setStatus(1);
+    job.setName(taskDto.getName());
     log.info("处理任务成功[{}][{}]", job.getType(), job.getUrl());
     wkcJobService.update(job);
   }
