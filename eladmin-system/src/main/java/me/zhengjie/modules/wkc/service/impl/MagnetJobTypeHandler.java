@@ -36,6 +36,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     if (user.getDefaultDeviceId() == null || user.getDefaultDeviceId().isEmpty()) {
       log.error("用户[{}]未设置默认设备", user.getPhone());
       job.setExceptionMsg("用户未设置默认设备");
+      job.setStatus(-1);
       wkcJobService.update(job);
       return;
     }
@@ -43,6 +44,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     if (CollectionUtils.isEmpty(usbs)){
       log.error("用户[{}]默认设备未在线", user.getPhone());
       job.setExceptionMsg("用户默认设备未在线");
+      job.setStatus(-1);
       wkcJobService.update(job);
       return;
     }
@@ -50,6 +52,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
         .resolveUrl(job.getWkcUserId(), user.getDefaultPeerId(), job.getUrl());
     if (!urlResolveDto.success()) {
       log.error("url[{}]解析失败", job.getUrl(), urlResolveDto);
+      job.setStatus(-1);
       job.setExceptionMsg("url解析失败!");
       wkcJobService.update(job);
       return;
@@ -57,6 +60,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     TaskDto taskDto = urlResolveDto.getTaskDto();
     if (urlResolveDto.getInfoHash() == null || urlResolveDto.getInfoHash().isEmpty()) {
       log.error("MAGNET[{}]未找到HashInfo", job.getUrl());
+      job.setStatus(-1);
       job.setExceptionMsg("未获取到hashInfo");
       wkcJobService.update(job);
       return;
@@ -64,6 +68,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
 
     if (user.getDefaultUsbUuid() == null) {
       log.error("用户{}的默认下载磁盘为空", user.getPhone());
+      job.setStatus(-1);
       job.setExceptionMsg("默认下载磁盘为空");
       wkcJobService.update(job);
       return;
@@ -73,6 +78,7 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     TaskActionDto taskActionDto = wkcUserService.createTask(job.getWkcUserId(),
         user.getDefaultPeerId(), path, taskDto.getName(), taskDto.getUrl());
     if (!taskActionDto.success()) {
+      job.setStatus(-1);
       job.setExceptionMsg("下载失败!");
       wkcJobService.update(job);
       return;

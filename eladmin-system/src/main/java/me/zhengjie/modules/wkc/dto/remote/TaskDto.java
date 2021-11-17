@@ -25,7 +25,7 @@ public class TaskDto {
     @JsonProperty("progress")
     private Integer progress;
     @JsonProperty("exist")
-    private Integer exist;
+    private Boolean exist;
     @JsonProperty("url")
     private String url;
     @JsonProperty("remainTime")

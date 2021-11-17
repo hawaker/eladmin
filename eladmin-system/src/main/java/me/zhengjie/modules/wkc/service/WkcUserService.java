@@ -213,4 +213,12 @@ public interface WkcUserService {
      * @param wkcUserId
      */
     void refreshUuid(Integer wkcUserId);
+
+    /**
+     * 获取用户信息
+     *
+     * @param wkcUserId
+     * @return
+     */
+    WkcUser getWkcUser(Integer wkcUserId);
 }

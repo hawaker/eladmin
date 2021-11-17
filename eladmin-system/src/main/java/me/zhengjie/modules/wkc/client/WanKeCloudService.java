@@ -60,10 +60,10 @@ public class WanKeCloudService {
         WanKeCloudService wanKeCloudService = new WanKeCloudService();
         wanKeCloudService.initService();
 
-        //AccountResponseDto<UserDto> user = wanKeCloudService.login("17600776604", "b13frdely");
-        //
-        //String sessionId = user.getData().getSessionId();
-        //String userId = user.getData().getUserId();
+        AccountResponseDto<UserDto> user = wanKeCloudService.login("17600776604", "b13frdely");
+
+        String sessionId = user.getData().getSessionId();
+        String userId = user.getData().getUserId();
         //System.out.println(sessionId);
         //System.out.println(userId);
         //
@@ -87,20 +87,21 @@ public class WanKeCloudService {
         //
         //UrlResolveDto urlResolveDto = wanKeCloudService.urlResolve(sessionId, userId, peerId, "https://bitsdts.net/torrent/AAF43B6092953A93DC9DE0377CCF3603BA0D73CB");
         //System.out.println(Json.encode(urlResolveDto));
-        String sessionId="cs001.373976D0F6095C3A9C6B8D7D3F883421";
-        String userId="1626853709";
+        //String sessionId="cs001.373976D0F6095C3A9C6B8D7D3F883421";
+        //String userId="1626853709";
         String deviceId = "duzIPMzw3395";
         String peerId = "B0D59DE2E05A889X0030";
-        String buf="{\"infohash\":\"\",\"taskInfo\":{\"createTime\":0,\"dcdnChannel\":{\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"state\":0,\"failCode\":0,\"speed\":0},\"state\":0,\"id\":\"0\",\"refer\":\"\",\"progress\":0,\"exist\":0,\"url\":\"https:\\/\\/bitsdts.net\\/torrent\\/AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"remainTime\":0,\"size\":\"0\",\"name\":\"AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"failCode\":0,\"lixianChannel\":{\"dlBytes\":1234,\"state\":0,\"serverSpeed\":0,\"dlSize\":\"0\",\"serverProgress\":0,\"failCode\":0,\"speed\":0},\"from\":0,\"subList\":[],\"path\":\"\\/app\\/system\\/miner.plugin-etm.ipk\\/tmp\\/\",\"speed\":0,\"downTime\":0,\"vipChannel\":{\"opened\":0,\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"speed\":0,\"failCode\":0,\"type\":0},\"completeTime\":0,\"type\":1},\"rtn\":0}";
-        StringMap stringMap = Json.decode(buf);
-        System.out.println(Json.encode(stringMap.get("taskInfo")));
+        //String buf="{\"infohash\":\"\",\"taskInfo\":{\"createTime\":0,\"dcdnChannel\":{\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"state\":0,\"failCode\":0,\"speed\":0},\"state\":0,\"id\":\"0\",\"refer\":\"\",\"progress\":0,\"exist\":0,\"url\":\"https:\\/\\/bitsdts.net\\/torrent\\/AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"remainTime\":0,\"size\":\"0\",\"name\":\"AAF43B6092953A93DC9DE0377CCF3603BA0D73CB\",\"failCode\":0,\"lixianChannel\":{\"dlBytes\":1234,\"state\":0,\"serverSpeed\":0,\"dlSize\":\"0\",\"serverProgress\":0,\"failCode\":0,\"speed\":0},\"from\":0,\"subList\":[],\"path\":\"\\/app\\/system\\/miner.plugin-etm.ipk\\/tmp\\/\",\"speed\":0,\"downTime\":0,\"vipChannel\":{\"opened\":0,\"dlBytes\":1234,\"available\":0,\"dlSize\":\"0\",\"speed\":0,\"failCode\":0,\"type\":0},\"completeTime\":0,\"type\":1},\"rtn\":0}";
+        //StringMap stringMap = Json.decode(buf);
+        //System.out.println(Json.encode(stringMap.get("taskInfo")));
         //List<TaskDto> tasks = new ArrayList<>();
-        TaskDto taskDto = new TaskDto();
-        taskDto.setName(stringMap.get("taskInfo").getClass().getSimpleName());
-        taskDto.setUrl("ed2k://|file|%E9%BB%84%E7%9F%B3.Yellowstone.2018.S01E08.%E4%B8%AD%E8%8B%B1%E5%AD%97%E5%B9%95.WEB.720P-%E4%BA%BA%E4%BA%BA%E5%BD%B1%E8%A7%86.mp4|472873520|c273bf00703b45225f2056393d6de87f|h=yq4vc2vndh2fnqdiwnhnqapwh7xcvlrw|/");
-        //tasks.add(taskDto);
+        //TaskDto taskDto = new TaskDto();
+        //taskDto.setName(stringMap.get("taskInfo").getClass().getSimpleName());
+        //taskDto.setUrl("ed2k://|file|%E9%BB%84%E7%9F%B3.Yellowstone.2018.S01E08.%E4%B8%AD%E8%8B%B1%E5%AD%97%E5%B9%95.WEB.720P-%E4%BA%BA%E4%BA%BA%E5%BD%B1%E8%A7%86.mp4|472873520|c273bf00703b45225f2056393d6de87f|h=yq4vc2vndh2fnqdiwnhnqapwh7xcvlrw|/");
+        ////tasks.add(taskDto);
         //TaskActionDto TaskActionDto = wanKeCloudService.createTask(sessionId, userId, peerId, "/media/sda1/onecloud/tddownload", taskDto);
-        //DownloadListDto remoteDownloadLogin1 = wanKeCloudService.remoteDownloadList(sessionId, userId, peerId, 0, 10);
+        DownloadListDto remoteDownloadLogin1 = wanKeCloudService.remoteDownloadList(sessionId, userId, peerId, 0, 10);
+        System.out.println(Json.encode(Json.encode(remoteDownloadLogin1)));
         //String taskId = "";
         //List<TaskDto> taskDtos = remoteDownloadLogin1.getTasks();
         //for (TaskDto taskDto1 : taskDtos) {

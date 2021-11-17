@@ -17,23 +17,18 @@ package me.zhengjie.modules.wkc.repository;
 
 import java.util.List;
 import me.zhengjie.modules.wkc.domain.WkcJob;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.data.domain.Pageable;
+import me.zhengjie.modules.wkc.domain.WkcTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
 
 /**
 * @website https://el-admin.vip
-* @author caoqingyuan
-* @date 2021-07-12
+* @author hawaker
+* @date 2021-11-17
 **/
-public interface WkcJobRepository extends JpaRepository<WkcJob, Integer>, JpaSpecificationExecutor<WkcJob> {
+public interface WkcTaskRepository extends JpaRepository<WkcTask, Integer>, JpaSpecificationExecutor<WkcTask> {
 
-  List<WkcJob> queryByStatus(Integer status);
+  WkcTask getByWkcId(String wkcId);
 
-  List<WkcJob> queryByUserIdAndTypeAndUrl(Long userId,String type,String url);
-
-  @Query("select e from WkcJob e where e.status=:status")
-  List<WkcJob> queryByStatusLimit(@Param("status") Integer status, Pageable pageable);
+  List<WkcTask> findByStateNotIn(List<Integer> states);
 }

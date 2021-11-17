@@ -142,7 +142,7 @@ public class WkcUserServiceImpl implements WkcUserService {
 
 
 
-  private WkcUser getWkcUser(Integer wkcUserId) {
+  public WkcUser getWkcUser(Integer wkcUserId) {
     Optional<WkcUser> wkcUserOpt = wkcUserRepository.findById(wkcUserId);
     Assert.notNull(wkcUserOpt, "获取玩客云用户出错,id:" + wkcUserId);
     WkcUser wkcUser=wkcUserOpt.get();
