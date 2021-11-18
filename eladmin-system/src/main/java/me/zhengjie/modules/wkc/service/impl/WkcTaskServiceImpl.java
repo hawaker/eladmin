@@ -201,7 +201,6 @@ public class WkcTaskServiceImpl implements WkcTaskService {
     }
     BeanUtils.copyProperties(task, wkcTask, new String[]{"id"});
     wkcTask.setLastSyncTime((int) Instant.now().getEpochSecond());
-    wkcTaskRepository.save(wkcTask);
     if (WkcTaskStateEnum.done.getId() == task.getState() && !task.getExist()) {
       wkcUserService.delTask(wkcUserId, peerId, task.getId(), false, false);
       log.info("文件已完成,删除任务记录{}", task.getId());
@@ -217,20 +216,18 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       if (taskErrorCount < 10) {
         wkcUserService.startTask(wkcUserId, peerId, task.getId());
         wkcTask.setErrorCount(taskErrorCount + 1);
-        wkcTaskRepository.save(wkcTask);
       } else if (task.getProgress()>9800){
         log.info("文件已达到最大重试次数,暂停任务:{}", task.getId());
         wkcUserService.pauseTask(wkcUserId, peerId, task.getId());
-        wkcTaskRepository.save(wkcTask);
       }else{
         log.info("文件已达到最大重试次数,删除任务:{}", task.getId());
         wkcUserService.delTask(wkcUserId, peerId, task.getId(), true, false);
         wkcTask.setRemoteDelete(true);
-        wkcTaskRepository.save(wkcTask);
       }
     }
     //if (WkcTaskStateEnum.suspend.getId() == task.getState()) {
     //  wkcUserService.startTask(wkcUserId, peerId, task.getId());
     //}
+    wkcTaskRepository.save(wkcTask);
   }
 }
