@@ -25,7 +25,7 @@ class WkcTaskServiceImplTest {
   WkcTaskService wkcTaskService;
   @Test
   void syncTask() {
-    wkcTaskService.syncTask(1);
+    wkcTaskService.syncTask("1");
   }
 
   @Test

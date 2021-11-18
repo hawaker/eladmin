@@ -166,7 +166,8 @@ public class WkcTaskServiceImpl implements WkcTaskService {
   }
 
   @Override
-  public void syncTask(Integer wkcUserId) {
+  public void syncTask(String wkcUserIdStr) {
+    Integer wkcUserId=Integer.parseInt(wkcUserIdStr);
     Integer page = 0;
     Integer perPage = 10;
     WkcUser wkcUser = wkcUserService.getWkcUser(wkcUserId);

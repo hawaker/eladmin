@@ -86,7 +86,7 @@ public interface WkcTaskService {
      *
      * @param wkcTaskId
      */
-    void syncTask(Integer wkcTaskId);
+    void syncTask(String wkcTaskId);
 
 
     void taskCheck(Integer wkcUserId, Integer taskCount);
