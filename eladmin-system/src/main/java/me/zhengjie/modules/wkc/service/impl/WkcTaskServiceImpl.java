@@ -153,7 +153,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
   public void taskCheck(Integer wkcUserId, Integer taskCount) {
     List<WkcTask> tasks = wkcTaskRepository
         .findByStateNotIn(Arrays.asList(WkcTaskStateEnum.done.getId(),
-            WkcTaskStateEnum.suspend.getId())
+            WkcTaskStateEnum.suspend.getId(),WkcTaskStateEnum.deprecated.getId())
         );
     Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
     if (downloadingCount<taskCount){
@@ -189,7 +189,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       }
       page++;
     }
-    taskCheck(wkcUserId,30);
+    taskCheck(wkcUserId,20);
   }
 
   private void syncTask(TaskDto task, Integer wkcUserId, String peerId) {

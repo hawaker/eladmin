@@ -17,6 +17,7 @@ public enum WkcTaskStateEnum {
   downloading(0,"下载中"),
   suspend(9,"暂停中"),
   waiting(8,"排队中"),
+  deprecated(14,"作废"),
   ;
   private int id;
   private String desc;
