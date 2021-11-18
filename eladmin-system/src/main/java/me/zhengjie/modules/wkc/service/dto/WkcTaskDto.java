@@ -59,7 +59,7 @@ public class WkcTaskDto implements Serializable {
 
     private Integer progress;
 
-    private Integer exist;
+    private Boolean exist;
 
     private Integer remainTime;
 
