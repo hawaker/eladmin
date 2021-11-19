@@ -151,10 +151,13 @@ public class WkcTaskServiceImpl implements WkcTaskService {
    * @param taskCount
    */
   public void taskCheck(Integer wkcUserId, Integer taskCount) {
-    List<WkcTask> tasks = wkcTaskRepository
-        .findByRemoteDeleteAndStateNotIn(false,Arrays.asList(WkcTaskStateEnum.done.getId(),
-            WkcTaskStateEnum.suspend.getId(),WkcTaskStateEnum.deprecated.getId())
-        );
+    List<WkcTask> tasks = wkcTaskRepository.findNotDeleteAndStateNotIn(
+        Arrays.asList(
+            WkcTaskStateEnum.done.getId(),
+            WkcTaskStateEnum.suspend.getId(),
+            WkcTaskStateEnum.deprecated.getId()
+        )
+    );
     Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
     if (downloadingCount<taskCount){
       Integer download=taskCount-downloadingCount;
@@ -174,6 +177,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
     Integer page = 0;
     Integer perPage = 10;
     WkcUser wkcUser = wkcUserService.getWkcUser(wkcUserId);
+    List<String> ids=new ArrayList<>();
     while (true) {
       DownloadListDto downloadListDto = wkcUserService
           .queryUserTasks(wkcUserId, wkcUser.getDefaultPeerId(), page * perPage, perPage);
@@ -186,6 +190,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       }
       for (TaskDto task : tasks) {
         syncTask(task, wkcUserId, wkcUser.getDefaultPeerId());
+        ids.add(task.getId());
       }
       page++;
     }

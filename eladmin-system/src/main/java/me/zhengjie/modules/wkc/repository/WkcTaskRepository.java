@@ -20,6 +20,10 @@ import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.domain.WkcTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @website https://el-admin.vip
@@ -30,5 +34,7 @@ public interface WkcTaskRepository extends JpaRepository<WkcTask, Integer>, JpaS
 
   WkcTask getByWkcId(String wkcId);
 
-  List<WkcTask> findByRemoteDeleteAndStateNotIn(Boolean exists,List<Integer> states);
+  @Query(value = "select * from wkc_task where remote_delete !=1 and state not in :states",nativeQuery = true)
+  List<WkcTask> findNotDeleteAndStateNotIn(@Param("states")List<Integer> states);
+
 }
