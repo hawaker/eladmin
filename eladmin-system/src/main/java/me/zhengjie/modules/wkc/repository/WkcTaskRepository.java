@@ -30,5 +30,5 @@ public interface WkcTaskRepository extends JpaRepository<WkcTask, Integer>, JpaS
 
   WkcTask getByWkcId(String wkcId);
 
-  List<WkcTask> findByStateNotIn(List<Integer> states);
+  List<WkcTask> findByRemoteDeleteAndStateNotIn(Boolean exists,List<Integer> states);
 }

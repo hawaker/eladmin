@@ -152,7 +152,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
    */
   public void taskCheck(Integer wkcUserId, Integer taskCount) {
     List<WkcTask> tasks = wkcTaskRepository
-        .findByStateNotIn(Arrays.asList(WkcTaskStateEnum.done.getId(),
+        .findByRemoteDeleteAndStateNotIn(false,Arrays.asList(WkcTaskStateEnum.done.getId(),
             WkcTaskStateEnum.suspend.getId(),WkcTaskStateEnum.deprecated.getId())
         );
     Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
@@ -198,6 +198,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       wkcTask = new WkcTask();
       wkcTask.setWkcUserId(wkcUserId);
       wkcTask.setWkcId(task.getId());
+      wkcTask.setRemoteDelete(false);
     }
     BeanUtils.copyProperties(task, wkcTask, new String[]{"id"});
     wkcTask.setLastSyncTime((int) Instant.now().getEpochSecond());
@@ -213,7 +214,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       taskErrorCount = 0;
     }
     if (WkcTaskStateEnum.error.getId() == task.getState()) {
-      if (taskErrorCount < 10) {
+      if (taskErrorCount < 5) {
         wkcUserService.startTask(wkcUserId, peerId, task.getId());
         wkcTask.setErrorCount(taskErrorCount + 1);
       } else if (task.getProgress()>9800){
