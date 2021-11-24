@@ -13,7 +13,7 @@ public class FileDto {
     @JsonProperty("selected")
     private Integer selected;
     @JsonProperty("size")
-    private String size;
+    private long size;
     @JsonProperty("name")
     private String name;
     @JsonProperty("id")

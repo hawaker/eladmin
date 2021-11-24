@@ -36,6 +36,7 @@ import me.zhengjie.modules.wkc.dto.control.ControlResponseDto;
 import me.zhengjie.modules.wkc.dto.control.DeviceDto;
 import me.zhengjie.modules.wkc.dto.control.PartitionDto;
 import me.zhengjie.modules.wkc.dto.remote.DownloadListDto;
+import me.zhengjie.modules.wkc.dto.remote.FileDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskActionDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskDto;
 import me.zhengjie.modules.wkc.dto.remote.UrlResolveDto;
@@ -247,6 +248,18 @@ public class WkcUserServiceImpl implements WkcUserService {
     TaskDto taskDto = new TaskDto();
     taskDto.setName(name);
     taskDto.setUrl(url);
+    return wanKeCloudService
+        .createTask(wkcUser.getToken(), wkcUser.getUserId(), peerId, path, taskDto);
+  }
+
+  @Override
+  public TaskActionDto createTask(Integer wkcUserId, String peerId, String path, String name,
+      String url,List<FileDto> files) {
+    WkcUser wkcUser = getWkcUser(wkcUserId);
+    TaskDto taskDto = new TaskDto();
+    taskDto.setName(name);
+    taskDto.setUrl(url);
+    taskDto.setSubList(files);
     return wanKeCloudService
         .createTask(wkcUser.getToken(), wkcUser.getUserId(), peerId, path, taskDto);
   }

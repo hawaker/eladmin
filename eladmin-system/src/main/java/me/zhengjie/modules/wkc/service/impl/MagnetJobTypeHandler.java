@@ -1,9 +1,14 @@
 package me.zhengjie.modules.wkc.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import me.zhengjie.modules.system.service.DictDetailService;
+import me.zhengjie.modules.system.service.dto.DictDetailDto;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.dto.control.PartitionDto;
+import me.zhengjie.modules.wkc.dto.remote.FileDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskActionDto;
 import me.zhengjie.modules.wkc.dto.remote.TaskDto;
 import me.zhengjie.modules.wkc.dto.remote.UrlResolveDto;
@@ -12,6 +17,8 @@ import me.zhengjie.modules.wkc.service.JobTypeHandler;
 import me.zhengjie.modules.wkc.service.WkcJobService;
 import me.zhengjie.modules.wkc.service.WkcUserService;
 import me.zhengjie.modules.wkc.service.dto.WkcUserDto;
+import me.zhengjie.utils.StringUtils;
+import me.zhengjie.utils.TemplateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -29,6 +36,9 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
   WkcUserService wkcUserService;
   @Autowired
   WkcJobService wkcJobService;
+
+  @Autowired
+  DictDetailService dictDetailService;
 
   @Override
   public void handle(WkcJob job) {
@@ -73,10 +83,25 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
       wkcJobService.update(job);
       return;
     }
+    List<DictDetailDto> dictDetails=dictDetailService.getDictByName("WKC");
+    if (!CollectionUtils.isEmpty(dictDetails)){
+      taskDto.getSubList().stream().forEach(s -> {
+        for (DictDetailDto dictDetailDto : dictDetails) {
+          String buf = TemplateUtils.process(fileToMap(s), dictDetailDto.getValue());
+          if (!StringUtils.isAllBlank(buf)) {
+            log.info("任务ID:{},文件名:{},命中配置:{}",job.getId(),s.getName(),dictDetailDto.getLabel());
+            s.setSelected(0);
+            return;
+          }
+        }
+        s.setSelected(1);
+      });
+    }
+
 
     String path = user.getDefaultUsbPath() + "/onecloud/tddownload";
     TaskActionDto taskActionDto = wkcUserService.createTask(job.getWkcUserId(),
-        user.getDefaultPeerId(), path, taskDto.getName(), taskDto.getUrl());
+        user.getDefaultPeerId(), path, taskDto.getName(), taskDto.getUrl(), taskDto.getSubList());
     if (!taskActionDto.success()) {
       job.setStatus(-1);
       job.setExceptionMsg("下载失败!");
@@ -87,5 +112,29 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     job.setName(taskDto.getName());
     log.info("处理任务成功[{}][{}]", job.getType(), job.getUrl());
     wkcJobService.update(job);
+  }
+
+  private static Map<String,Object> fileToMap(FileDto fileDto){
+    Map<String,Object> map = new HashMap<>();
+    map.put("name",fileDto.getName());
+    map.put("id",fileDto.getId());
+    map.put("selected",fileDto.getSelected());
+    map.put("size",fileDto.getSize());
+    return map;
+  }
+
+  public static void main(String[] args) {
+    FileDto fileDto=new FileDto();
+    fileDto.setName("avman.app_huntb00140/FGO命運1080p-23.mp4");
+    fileDto.setSelected(0);
+    fileDto.setSize(1368443);
+    fileDto.setId("1");
+
+    String buf1=TemplateUtils.process(fileToMap(fileDto),"<#if name?contains('FGO')>1</#if>");
+    System.out.println(buf1);
+
+    String buf=TemplateUtils.process(fileToMap(fileDto),"<#if name?ends_with('.apk')>1</#if>");
+    System.out.println(buf);
+
   }
 }
