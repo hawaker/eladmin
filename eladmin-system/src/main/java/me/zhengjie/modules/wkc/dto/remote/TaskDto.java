@@ -60,4 +60,6 @@ public class TaskDto {
     @JsonProperty("taskid")
     private String taskId;
     private String result;
+    @JsonProperty("btSub")
+    private List<String> btSub;
 }

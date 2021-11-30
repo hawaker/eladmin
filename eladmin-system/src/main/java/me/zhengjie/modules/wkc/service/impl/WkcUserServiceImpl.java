@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +56,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author hawaker
@@ -255,11 +257,14 @@ public class WkcUserServiceImpl implements WkcUserService {
   @Override
   public TaskActionDto createTask(Integer wkcUserId, String peerId, String path, String name,
       String url,List<FileDto> files) {
+    if (CollectionUtils.isEmpty(files)){
+      return createTask(wkcUserId,peerId,path,name,url);
+    }
     WkcUser wkcUser = getWkcUser(wkcUserId);
     TaskDto taskDto = new TaskDto();
     taskDto.setName(name);
     taskDto.setUrl(url);
-    taskDto.setSubList(files);
+    taskDto.setBtSub(files.stream().map(FileDto::getId).collect(Collectors.toList()));
     return wanKeCloudService
         .createTask(wkcUser.getToken(), wkcUser.getUserId(), peerId, path, taskDto);
   }

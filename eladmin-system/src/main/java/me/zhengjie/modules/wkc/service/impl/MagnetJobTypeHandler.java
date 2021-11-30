@@ -100,13 +100,10 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
     }
     List<FileDto> fileDtos=taskDto.getSubList().stream()
         .filter(s->s.getSelected().equals(1)).collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(fileDtos)){
-      taskDto.setSubList(fileDtos);
-    }
 
     String path = user.getDefaultUsbPath() + "/onecloud/tddownload";
     TaskActionDto taskActionDto = wkcUserService.createTask(job.getWkcUserId(),
-        user.getDefaultPeerId(), path, taskDto.getName(), taskDto.getUrl(), taskDto.getSubList());
+        user.getDefaultPeerId(), path, taskDto.getName(), taskDto.getUrl(), fileDtos);
     if (!taskActionDto.success()) {
       job.setStatus(-1);
       job.setExceptionMsg("下载失败!");

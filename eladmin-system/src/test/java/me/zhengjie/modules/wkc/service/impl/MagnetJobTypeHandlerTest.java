@@ -30,7 +30,11 @@ class MagnetJobTypeHandlerTest  {
   WkcJobRepository wkcJobRepository;
   @Test
   void handle() {
-    WkcJob wkcJob=wkcJobRepository.getOne(7089);
+    WkcJob wkcJob=wkcJobRepository.getOne(7274);
     magnetJobTypeHandler.handle(wkcJob);
+  }
+
+  @Test
+  void testHandle() {
   }
 }
