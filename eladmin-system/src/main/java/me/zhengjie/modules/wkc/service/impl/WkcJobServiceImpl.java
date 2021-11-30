@@ -107,7 +107,7 @@ public class WkcJobServiceImpl implements WkcJobService {
             Map<String,Object> map = new LinkedHashMap<>();
             map.put("任务类型", wkcJob.getType());
             map.put("网址", wkcJob.getUrl());
-            map.put(" createTime",  wkcJob.getCreateTime());
+            map.put("createTime", wkcJob.getCreateTime());
             map.put("归属用户", wkcJob.getUserId());
             map.put("归属玩客云用户", wkcJob.getWkcUserId());
             list.add(map);

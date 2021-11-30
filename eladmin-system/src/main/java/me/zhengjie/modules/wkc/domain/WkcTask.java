@@ -108,6 +108,8 @@ public class WkcTask implements Serializable {
 
     private Integer lastSyncTime;
 
+    private String peerId;
+
     public void copy(WkcTask source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }

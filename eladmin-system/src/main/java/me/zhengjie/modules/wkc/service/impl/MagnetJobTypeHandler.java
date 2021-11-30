@@ -3,6 +3,7 @@ package me.zhengjie.modules.wkc.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.modules.system.service.DictDetailService;
 import me.zhengjie.modules.system.service.dto.DictDetailDto;
@@ -97,7 +98,11 @@ public class MagnetJobTypeHandler implements JobTypeHandler {
         s.setSelected(1);
       });
     }
-
+    List<FileDto> fileDtos=taskDto.getSubList().stream()
+        .filter(s->s.getSelected().equals(1)).collect(Collectors.toList());
+    if (!CollectionUtils.isEmpty(fileDtos)){
+      taskDto.setSubList(fileDtos);
+    }
 
     String path = user.getDefaultUsbPath() + "/onecloud/tddownload";
     TaskActionDto taskActionDto = wkcUserService.createTask(job.getWkcUserId(),

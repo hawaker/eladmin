@@ -19,6 +19,8 @@ import cn.hutool.Hutool;
 import cn.hutool.core.date.DateUtil;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.domain.WkcTask;
@@ -150,24 +152,95 @@ public class WkcTaskServiceImpl implements WkcTaskService {
    * @param wkcUserId
    * @param taskCount
    */
+  @Override
   public void taskCheck(Integer wkcUserId, Integer taskCount) {
     List<WkcTask> tasks = wkcTaskRepository.findNotDeleteAndStateNotIn(
         Arrays.asList(
             WkcTaskStateEnum.done.getId(),
-            WkcTaskStateEnum.suspend.getId(),
             WkcTaskStateEnum.deprecated.getId()
         )
     );
-    Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
-    if (downloadingCount<taskCount){
-      Integer download=taskCount-downloadingCount;
-      List<WkcJob> wkcJobList=wkcJobRepository.queryByStatusLimit(0,
-          PageRequest.of(0,download, Direction.DESC,"id"));
-      if (!CollectionUtils.isEmpty(wkcJobList)){
-        wkcJobList.forEach(job -> {
-          jobTypeProxyService.handle(job);
-        });
-      }
+    if (CollectionUtils.isEmpty(tasks)){
+      return;
+    }
+    Map<Integer,List<WkcTask>> taskMap=tasks.stream().collect(Collectors.groupingBy(WkcTask::getState));
+    Integer maxDownloadingTask=3;
+    List<WkcTask> downLodingTasks=taskMap.get(WkcTaskStateEnum.downloading.getId());
+    Integer downloadingCount=0;
+    if (!CollectionUtils.isEmpty(downLodingTasks)){
+      downloadingCount=downLodingTasks.size();
+    }
+    if (downloadingCount < maxDownloadingTask) {
+      startSuspend(taskMap.get(WkcTaskStateEnum.suspend.getId()),
+          maxDownloadingTask - downloadingCount);
+    }
+    if (!CollectionUtils.isEmpty(downLodingTasks)){
+      downLodingTasks.stream().forEach(s->{
+        // 速度小于 100K 暂停任务
+        if(s.getSpeed()<100000){
+          wkcUserService.pauseTask(s.getWkcUserId(),s.getPeerId(),s.getWkcId());
+          s.setState(WkcTaskStateEnum.suspend.getId());
+          return;
+        }
+      });
+    }
+
+    //Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
+    //if (downloadingCount<taskCount){
+    //  Integer download=taskCount-downloadingCount;
+    //  List<WkcJob> wkcJobList=wkcJobRepository.queryByStatusLimit(0,
+    //      PageRequest.of(0,download, Direction.DESC,"id"));
+    //  if (!CollectionUtils.isEmpty(wkcJobList)){
+    //    wkcJobList.forEach(job -> {
+    //      jobTypeProxyService.handle(job);
+    //    });
+    //  }
+    //}
+    //Integer taskErrorCount = wkcTask.getErrorCount();
+    //if (taskErrorCount == null) {
+    //  taskErrorCount = 0;
+    //}
+    ////错误时
+    //if (WkcTaskStateEnum.error.getId() == task.getState()) {
+    //  if (taskErrorCount < 5) {
+    //    wkcUserService.startTask(wkcUserId, peerId, task.getId());
+    //    wkcTask.setErrorCount(taskErrorCount + 1);
+    //  } else if (task.getProgress()>9800){
+    //    log.info("文件已达到最大重试次数,暂停任务:{}", task.getId());
+    //    wkcUserService.pauseTask(wkcUserId, peerId, task.getId());
+    //  }else{
+    //    log.info("文件已达到最大重试次数,删除任务:{}", task.getId());
+    //    wkcUserService.delTask(wkcUserId, peerId, task.getId(), true, false);
+    //    wkcTask.setRemoteDelete(true);
+    //  }
+    //}
+  }
+
+  /**
+   * 按完成度
+   *
+   * @param wkcTasks
+   * @param count
+   */
+  public void startSuspend(List<WkcTask> wkcTasks,Integer count){
+    if (CollectionUtils.isEmpty(wkcTasks)){
+      return;
+    }
+    if (count<=0){
+      return;
+    }
+    List<WkcTask> buf=wkcTasks.stream()
+        .sorted(
+            Comparator
+            .comparing(WkcTask::getErrorCount)
+            .thenComparing(WkcTask::getProgress)
+            .reversed()
+        )
+        .collect(Collectors.toList());
+    for (int i = 0; i <count ; i++) {
+      WkcTask wkcTask=buf.get(i);
+      wkcTask.setErrorCount(wkcTask.getErrorCount()+1);
+      wkcUserService.startTask(wkcTask.getWkcUserId(),wkcTask.getPeerId(),wkcTask.getWkcId());
     }
   }
 
@@ -204,6 +277,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       wkcTask.setWkcUserId(wkcUserId);
       wkcTask.setWkcId(task.getId());
       wkcTask.setRemoteDelete(false);
+      wkcTask.setPeerId(peerId);
     }
     BeanUtils.copyProperties(task, wkcTask, new String[]{"id"});
     wkcTask.setLastSyncTime((int) Instant.now().getEpochSecond());
@@ -211,29 +285,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       wkcUserService.delTask(wkcUserId, peerId, task.getId(), false, false);
       log.info("文件已完成,删除任务记录{}", task.getId());
       wkcTask.setRemoteDelete(true);
-      wkcTaskRepository.save(wkcTask);
-      return;
     }
-    Integer taskErrorCount = wkcTask.getErrorCount();
-    if (taskErrorCount == null) {
-      taskErrorCount = 0;
-    }
-    if (WkcTaskStateEnum.error.getId() == task.getState()) {
-      if (taskErrorCount < 5) {
-        wkcUserService.startTask(wkcUserId, peerId, task.getId());
-        wkcTask.setErrorCount(taskErrorCount + 1);
-      } else if (task.getProgress()>9800){
-        log.info("文件已达到最大重试次数,暂停任务:{}", task.getId());
-        wkcUserService.pauseTask(wkcUserId, peerId, task.getId());
-      }else{
-        log.info("文件已达到最大重试次数,删除任务:{}", task.getId());
-        wkcUserService.delTask(wkcUserId, peerId, task.getId(), true, false);
-        wkcTask.setRemoteDelete(true);
-      }
-    }
-    //if (WkcTaskStateEnum.suspend.getId() == task.getState()) {
-    //  wkcUserService.startTask(wkcUserId, peerId, task.getId());
-    //}
     wkcTaskRepository.save(wkcTask);
   }
 }
