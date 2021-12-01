@@ -222,11 +222,10 @@ public class WkcTaskServiceImpl implements WkcTaskService {
     List<WkcTask> buf = wkcTasks.stream()
         .sorted(
             Comparator
-                .comparing(WkcTask::getErrorCount)
+                .comparing(WkcTask::getErrorCount).reversed()
                 .thenComparing(WkcTask::getProgress)
                 .reversed()
-        )
-        .collect(Collectors.toList());
+        ).collect(Collectors.toList());
     for (int i = 0; i < count; i++) {
       WkcTask wkcTask = buf.get(i);
       wkcTask.setErrorCount(wkcTask.getErrorCount() + 1);
