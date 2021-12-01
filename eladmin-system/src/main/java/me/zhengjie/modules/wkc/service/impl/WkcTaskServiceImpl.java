@@ -231,7 +231,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       WkcTask wkcTask = buf.get(i);
       wkcTask.setErrorCount(wkcTask.getErrorCount() + 1);
       wkcUserService.startTask(wkcTask.getWkcUserId(), wkcTask.getPeerId(), wkcTask.getWkcId());
-
+      wkcTaskRepository.save(wkcTask);
       startCount++;
     }
     return startCount;
