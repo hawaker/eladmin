@@ -171,8 +171,12 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       downloadingCount=downLodingTasks.size();
     }
     if (downloadingCount < maxDownloadingTask) {
-      startSuspend(taskMap.get(WkcTaskStateEnum.suspend.getId()),
+      Integer startCount = startSuspend(taskMap.get(WkcTaskStateEnum.suspend.getId()),
           maxDownloadingTask - downloadingCount);
+      if (startCount + downloadingCount < maxDownloadingTask) {
+        startSuspend(taskMap.get(WkcTaskStateEnum.error.getId()),
+            maxDownloadingTask - downloadingCount - startCount);
+      }
     }
     if (!CollectionUtils.isEmpty(downLodingTasks)){
       downLodingTasks.stream().forEach(s->{
@@ -222,13 +226,14 @@ public class WkcTaskServiceImpl implements WkcTaskService {
    * @param wkcTasks
    * @param count
    */
-  public void startSuspend(List<WkcTask> wkcTasks,Integer count){
+  public Integer startSuspend(List<WkcTask> wkcTasks,Integer count){
     if (CollectionUtils.isEmpty(wkcTasks)){
-      return;
+      return 0;
     }
     if (count<=0){
-      return;
+      return 0;
     }
+    Integer startCount=0;
     List<WkcTask> buf=wkcTasks.stream()
         .sorted(
             Comparator
@@ -241,7 +246,9 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       WkcTask wkcTask=buf.get(i);
       wkcTask.setErrorCount(wkcTask.getErrorCount()+1);
       wkcUserService.startTask(wkcTask.getWkcUserId(),wkcTask.getPeerId(),wkcTask.getWkcId());
+      startCount++;
     }
+    return startCount;
   }
 
   @Override
