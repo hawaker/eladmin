@@ -160,15 +160,17 @@ public class WkcTaskServiceImpl implements WkcTaskService {
             WkcTaskStateEnum.deprecated.getId()
         )
     );
-    if (CollectionUtils.isEmpty(tasks)){
+    if (CollectionUtils.isEmpty(tasks)) {
       return;
     }
-    Map<Integer,List<WkcTask>> taskMap=tasks.stream().collect(Collectors.groupingBy(WkcTask::getState));
-    Integer maxDownloadingTask=3;
-    List<WkcTask> downLodingTasks=taskMap.get(WkcTaskStateEnum.downloading.getId());
-    Integer downloadingCount=0;
-    if (!CollectionUtils.isEmpty(downLodingTasks)){
-      downloadingCount=downLodingTasks.size();
+    log.info("进行中的任务数:{}",tasks.size());
+    Map<Integer, List<WkcTask>> taskMap = tasks.stream()
+        .collect(Collectors.groupingBy(WkcTask::getState));
+    Integer maxDownloadingTask = 3;
+    List<WkcTask> downLodingTasks = taskMap.get(WkcTaskStateEnum.downloading.getId());
+    Integer downloadingCount = 0;
+    if (!CollectionUtils.isEmpty(downLodingTasks)) {
+      downloadingCount = downLodingTasks.size();
     }
     if (downloadingCount < maxDownloadingTask) {
       Integer startCount = startSuspend(taskMap.get(WkcTaskStateEnum.suspend.getId()),
@@ -178,46 +180,29 @@ public class WkcTaskServiceImpl implements WkcTaskService {
             maxDownloadingTask - downloadingCount - startCount);
       }
     }
-    if (!CollectionUtils.isEmpty(downLodingTasks)){
-      downLodingTasks.stream().forEach(s->{
+    List<WkcTask> wattingTasks = taskMap.get(WkcTaskStateEnum.waiting.getId());
+    Integer wattingCount = wattingTasks == null ? 0 : wattingTasks.size();
+    Integer pauseCount = 0;
+    Integer speedLimit=100000;
+    if (!CollectionUtils.isEmpty(downLodingTasks)) {
+      for (int i = 0; i < downLodingTasks.size(); i++) {
         // 速度小于 100K 暂停任务
-        if(s.getSpeed()<100000){
-          wkcUserService.pauseTask(s.getWkcUserId(),s.getPeerId(),s.getWkcId());
-          s.setState(WkcTaskStateEnum.suspend.getId());
-          return;
+        WkcTask s = downLodingTasks.get(i);
+        if (s.getSpeed() >= speedLimit) {
+          continue;
         }
-      });
+        log.info("任务名称:{},id:{},taskId:{},下载速度小于:{},暂停",s.getName(),s.getId(),s.getWkcId(),speedLimit);
+        wkcUserService.pauseTask(s.getWkcUserId(), s.getPeerId(), s.getWkcId());
+        s.setState(WkcTaskStateEnum.suspend.getId());
+        pauseCount++;
+      }
     }
-
-    //Integer downloadingCount=CollectionUtils.isEmpty(tasks)?0:tasks.size();
-    //if (downloadingCount<taskCount){
-    //  Integer download=taskCount-downloadingCount;
-    //  List<WkcJob> wkcJobList=wkcJobRepository.queryByStatusLimit(0,
-    //      PageRequest.of(0,download, Direction.DESC,"id"));
-    //  if (!CollectionUtils.isEmpty(wkcJobList)){
-    //    wkcJobList.forEach(job -> {
-    //      jobTypeProxyService.handle(job);
-    //    });
-    //  }
-    //}
-    //Integer taskErrorCount = wkcTask.getErrorCount();
-    //if (taskErrorCount == null) {
-    //  taskErrorCount = 0;
-    //}
-    ////错误时
-    //if (WkcTaskStateEnum.error.getId() == task.getState()) {
-    //  if (taskErrorCount < 5) {
-    //    wkcUserService.startTask(wkcUserId, peerId, task.getId());
-    //    wkcTask.setErrorCount(taskErrorCount + 1);
-    //  } else if (task.getProgress()>9800){
-    //    log.info("文件已达到最大重试次数,暂停任务:{}", task.getId());
-    //    wkcUserService.pauseTask(wkcUserId, peerId, task.getId());
-    //  }else{
-    //    log.info("文件已达到最大重试次数,删除任务:{}", task.getId());
-    //    wkcUserService.delTask(wkcUserId, peerId, task.getId(), true, false);
-    //    wkcTask.setRemoteDelete(true);
-    //  }
-    //}
+    if (wattingCount<=0&&pauseCount>0){
+      Integer startCount = startSuspend(taskMap.get(WkcTaskStateEnum.suspend.getId()), pauseCount);
+      if (startCount + pauseCount < maxDownloadingTask) {
+        startSuspend(taskMap.get(WkcTaskStateEnum.error.getId()), pauseCount-startCount);
+      }
+    }
   }
 
   /**
@@ -226,26 +211,27 @@ public class WkcTaskServiceImpl implements WkcTaskService {
    * @param wkcTasks
    * @param count
    */
-  public Integer startSuspend(List<WkcTask> wkcTasks,Integer count){
-    if (CollectionUtils.isEmpty(wkcTasks)){
+  public Integer startSuspend(List<WkcTask> wkcTasks, Integer count) {
+    if (CollectionUtils.isEmpty(wkcTasks)) {
       return 0;
     }
-    if (count<=0){
+    if (count <= 0) {
       return 0;
     }
-    Integer startCount=0;
-    List<WkcTask> buf=wkcTasks.stream()
+    Integer startCount = 0;
+    List<WkcTask> buf = wkcTasks.stream()
         .sorted(
             Comparator
-            .comparing(WkcTask::getErrorCount)
-            .thenComparing(WkcTask::getProgress)
-            .reversed()
+                .comparing(WkcTask::getErrorCount)
+                .thenComparing(WkcTask::getProgress)
+                .reversed()
         )
         .collect(Collectors.toList());
-    for (int i = 0; i <count ; i++) {
-      WkcTask wkcTask=buf.get(i);
-      wkcTask.setErrorCount(wkcTask.getErrorCount()+1);
-      wkcUserService.startTask(wkcTask.getWkcUserId(),wkcTask.getPeerId(),wkcTask.getWkcId());
+    for (int i = 0; i < count; i++) {
+      WkcTask wkcTask = buf.get(i);
+      wkcTask.setErrorCount(wkcTask.getErrorCount() + 1);
+      wkcUserService.startTask(wkcTask.getWkcUserId(), wkcTask.getPeerId(), wkcTask.getWkcId());
+
       startCount++;
     }
     return startCount;
@@ -253,11 +239,11 @@ public class WkcTaskServiceImpl implements WkcTaskService {
 
   @Override
   public void syncTask(String wkcUserIdStr) {
-    Integer wkcUserId=Integer.parseInt(wkcUserIdStr);
+    Integer wkcUserId = Integer.parseInt(wkcUserIdStr);
     Integer page = 0;
     Integer perPage = 10;
     WkcUser wkcUser = wkcUserService.getWkcUser(wkcUserId);
-    List<String> ids=new ArrayList<>();
+    wkcTaskRepository.updateAllNotExists();
     while (true) {
       DownloadListDto downloadListDto = wkcUserService
           .queryUserTasks(wkcUserId, wkcUser.getDefaultPeerId(), page * perPage, perPage);
@@ -270,11 +256,10 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       }
       for (TaskDto task : tasks) {
         syncTask(task, wkcUserId, wkcUser.getDefaultPeerId());
-        ids.add(task.getId());
       }
       page++;
     }
-    taskCheck(wkcUserId,20);
+    taskCheck(wkcUserId, 20);
   }
 
   private void syncTask(TaskDto task, Integer wkcUserId, String peerId) {
@@ -283,16 +268,15 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       wkcTask = new WkcTask();
       wkcTask.setWkcUserId(wkcUserId);
       wkcTask.setWkcId(task.getId());
-      wkcTask.setRemoteDelete(false);
       wkcTask.setErrorCount(0);
       wkcTask.setPeerId(peerId);
     }
+    wkcTask.setRemoteDelete(false);
     BeanUtils.copyProperties(task, wkcTask, new String[]{"id"});
     wkcTask.setLastSyncTime((int) Instant.now().getEpochSecond());
     if (WkcTaskStateEnum.done.getId() == task.getState() && !task.getExist()) {
       wkcUserService.delTask(wkcUserId, peerId, task.getId(), false, false);
       log.info("文件已完成,删除任务记录{}", task.getId());
-      wkcTask.setRemoteDelete(true);
     }
     wkcTaskRepository.save(wkcTask);
   }

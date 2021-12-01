@@ -16,6 +16,7 @@
 package me.zhengjie.modules.wkc.repository;
 
 import java.util.List;
+import me.zhengjie.base.BaseEntity.Update;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.domain.WkcTask;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,4 +38,8 @@ public interface WkcTaskRepository extends JpaRepository<WkcTask, Integer>, JpaS
   @Query(value = "select * from wkc_task where remote_delete !=1 and state not in :states",nativeQuery = true)
   List<WkcTask> findNotDeleteAndStateNotIn(@Param("states")List<Integer> states);
 
+  @Transactional
+  @Modifying
+  @Query(value = "update WkcTask set remoteDelete=true where 1=1")
+  void updateAllNotExists();
 }
