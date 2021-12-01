@@ -284,6 +284,7 @@ public class WkcTaskServiceImpl implements WkcTaskService {
       wkcTask.setWkcUserId(wkcUserId);
       wkcTask.setWkcId(task.getId());
       wkcTask.setRemoteDelete(false);
+      wkcTask.setErrorCount(0);
       wkcTask.setPeerId(peerId);
     }
     BeanUtils.copyProperties(task, wkcTask, new String[]{"id"});
