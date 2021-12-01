@@ -33,6 +33,7 @@ public class WanKeCloudService {
     public WanKeCloudAccountClient wanKeCloudAccountClient;
     public WanKeCloudControlClient wanKeCloudControlClient;
     public WanKeCloudRemoteDownloadClient wanKeCloudRemoteDownloadClient;
+    public WankeCloudRemoteDownloadSecurityClient wankeCloudRemoteDownloadSecurityClient;
 
     @PostConstruct
     public void initService() {
@@ -54,6 +55,12 @@ public class WanKeCloudService {
                 .requestInterceptor(new WanKeCloudRequestInterceptor())
                 .decoder(new WanKeCloudDecoder())
                 .target(WanKeCloudRemoteDownloadClient.class, "http://control-remotedl.onethingpcs.com/");
+        this.wankeCloudRemoteDownloadSecurityClient = Feign.builder()
+            .encoder(new WanKeCloudEncoder())
+            .retryer(Retryer.NEVER_RETRY)
+            .requestInterceptor(new WanKeCloudRequestInterceptor())
+            .decoder(new WanKeCloudDecoder())
+            .target(WankeCloudRemoteDownloadSecurityClient.class, "https://control-remotedl.onethingpcs.com/");
     }
 
     public static void main(String[] args) {
@@ -389,23 +396,30 @@ public class WanKeCloudService {
         return this.urlResolve(sessionId, userId, peerId, url, "1", "31");
     }
 
-    /**
-     * 批量创建下载任务
-     *
-     * @param sessionId
-     * @param userId
-     * @param peerId
-     * @param path
-     * @param tasks
-     * @param v
-     * @param ct
-     * @return
-     */
-    public TaskActionDto createTasks(String sessionId, String userId, String peerId, String path, List<TaskDto> tasks, String v, String ct) {
+    ///**
+    // * 批量创建下载任务
+    // *
+    // * @param sessionId
+    // * @param userId
+    // * @param peerId
+    // * @param path
+    // * @param tasks
+    // * @param v
+    // * @param ct
+    // * @return
+    // */
+    //public TaskActionDto createTasks(String sessionId, String userId, String peerId, String path, List<TaskDto> tasks, String v, String ct) {
+    //    LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+    //    params.put("path", path);
+    //    params.put("tasks", tasks);
+    //    return this.wanKeCloudRemoteDownloadClient.createTask(sessionId, userId, peerId, v, ct, params);
+    //}
+
+    public TaskActionDto createBatchTasks(String sessionId, String userId, String peerId, String path, List<TaskDto> tasks){
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         params.put("path", path);
         params.put("tasks", tasks);
-        return this.wanKeCloudRemoteDownloadClient.createTask(sessionId, userId, peerId, v, ct, params);
+        return this.wankeCloudRemoteDownloadSecurityClient.createBatchTask(sessionId,userId,peerId,params);
     }
 
     /**
@@ -424,6 +438,7 @@ public class WanKeCloudService {
         return this.createTask(sessionId, userId, peerId, path, taskDtos);
     }
 
+
     /**
      * 批量创建下载任务
      *
@@ -435,7 +450,7 @@ public class WanKeCloudService {
      * @return
      */
     public TaskActionDto createTask(String sessionId, String userId, String peerId, String path, List<TaskDto> tasks) {
-        return this.createTasks(sessionId, userId, peerId, path, tasks, "1", "31");
+        return this.createBatchTasks(sessionId,userId,peerId,path,tasks);
     }
 
 

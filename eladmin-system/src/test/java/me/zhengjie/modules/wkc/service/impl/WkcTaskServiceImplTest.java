@@ -32,4 +32,5 @@ class WkcTaskServiceImplTest {
   void taskCheck() {
     wkcTaskService.taskCheck(1,30);
   }
+
 }
