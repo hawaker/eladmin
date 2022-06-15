@@ -3,8 +3,11 @@ package me.zhengjie.modules.wkc.client;
 import cn.hutool.json.JSON;
 import com.qiniu.util.Json;
 import com.qiniu.util.StringMap;
+import feign.Client;
 import feign.Feign;
 import feign.Retryer;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,21 +40,27 @@ public class WanKeCloudService {
 
     @PostConstruct
     public void initService() {
+        FeginClientConfig feginClientConfig=new FeginClientConfig();
+        try {
+            Client client= feginClientConfig.getClient();
         this.wanKeCloudAccountClient = Feign.builder()
                 .encoder(new WanKeCloudEncoder())
                 .retryer(Retryer.NEVER_RETRY)
                 .requestInterceptor(new WanKeCloudRequestInterceptor())
                 .decoder(new WanKeCloudDecoder())
+                .client(client)
                 .target(WanKeCloudAccountClient.class, "https://account.onethingpcs.com");
         this.wanKeCloudControlClient = Feign.builder()
                 .encoder(new WanKeCloudEncoder())
                 .retryer(Retryer.NEVER_RETRY)
                 .requestInterceptor(new WanKeCloudRequestInterceptor())
+            .client(client)
                 .decoder(new WanKeCloudDecoder())
                 .target(WanKeCloudControlClient.class, "https://control.onethingpcs.com");
         this.wanKeCloudRemoteDownloadClient = Feign.builder()
                 .encoder(new WanKeCloudEncoder())
                 .retryer(Retryer.NEVER_RETRY)
+            .client(client)
                 .requestInterceptor(new WanKeCloudRequestInterceptor())
                 .decoder(new WanKeCloudDecoder())
                 .target(WanKeCloudRemoteDownloadClient.class, "http://control-remotedl.onethingpcs.com/");
@@ -59,8 +68,14 @@ public class WanKeCloudService {
             .encoder(new WanKeCloudEncoder())
             .retryer(Retryer.NEVER_RETRY)
             .requestInterceptor(new WanKeCloudRequestInterceptor())
+            .client(client)
             .decoder(new WanKeCloudDecoder())
             .target(WankeCloudRemoteDownloadSecurityClient.class, "https://control-remotedl.onethingpcs.com/");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
