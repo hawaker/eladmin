@@ -2,6 +2,7 @@ package me.zhengjie.modules.wkc.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import javax.annotation.Resource;
 import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.repository.WkcJobRepository;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class MagnetJobTypeHandlerTest  {
   MagnetJobTypeHandler magnetJobTypeHandler;
   @Autowired
   WkcJobRepository wkcJobRepository;
+
+  @Resource
+  BTJobTypeHandler btJobTypeHandler;
   @Test
   void handle() {
     WkcJob wkcJob=wkcJobRepository.getOne(7274);
@@ -36,5 +40,8 @@ class MagnetJobTypeHandlerTest  {
 
   @Test
   void testHandle() {
+    WkcJob wkcJob=new WkcJob();
+    wkcJob.setUrl("http://mp4ppp.com/fs/Public/BB32251004F1422A9BE4384CEB74F004");
+    btJobTypeHandler.handle(wkcJob);
   }
 }

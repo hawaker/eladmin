@@ -45,7 +45,7 @@ public class BTJobTypeHandler implements JobTypeHandler {
     }
     String html = response.getBody();
     Document doc = Jsoup.parse(html);
-    Elements elements = doc.getElementsByClass("uk-button ");
+    Elements elements = doc.getElementsByTag("a");
     String magnet = null;
     for (Element element : elements) {
       String buf = element.attr("href");
