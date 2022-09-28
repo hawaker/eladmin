@@ -59,7 +59,7 @@ public class BTJobTypeHandler implements JobTypeHandler {
         String clickBuf[]=clickAttr.split("'");
         for (int i = 0; i < clickBuf.length; i++) {
           if (clickBuf[i].startsWith("magnet:")){
-            magnet = buf;
+            magnet = clickBuf[i];
             break;
           }
         }
