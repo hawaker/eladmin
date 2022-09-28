@@ -4,6 +4,7 @@ import me.zhengjie.modules.wkc.domain.WkcJob;
 import me.zhengjie.modules.wkc.service.HandleJobType;
 import me.zhengjie.modules.wkc.service.JobTypeHandler;
 import me.zhengjie.modules.wkc.service.WkcJobService;
+import me.zhengjie.utils.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -52,6 +53,16 @@ public class BTJobTypeHandler implements JobTypeHandler {
       if (buf.startsWith("magnet:")) {
         magnet = buf;
         break;
+      }
+      String clickAttr=element.attr("onclick");
+      if (StringUtils.isNotEmpty(clickAttr)&&clickAttr.contains("magnet:")){
+        String clickBuf[]=clickAttr.split("'");
+        for (int i = 0; i < clickBuf.length; i++) {
+          if (clickBuf[i].startsWith("magnet:")){
+            magnet = buf;
+            break;
+          }
+        }
       }
     }
     if (null == magnet) {
